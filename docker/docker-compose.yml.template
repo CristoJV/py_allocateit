@@ -1,0 +1,44 @@
+version: '3-9'
+
+services:
+  allocateit: # Don't forget to change the name of the service
+    container_name: ${PROJECT_NAME}
+    image: ${PROJECT_NAME}:${PROJECT_VERSION}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        USER: ${USER}
+        UID: ${UID}
+        GID: ${GID}
+        WORKDIR: ${WORKDIR}
+        PYTHON_VERSION: ${PYTHON_VERSION}
+        VENV_PATH: ${VENV_PATH}
+        PYTORCH_VERSION: ${PYTORCH_VERSION}
+        TORCHVISION_VERSION: ${TORCHVISION_VERSION}
+        TORCHAUDIO_VERSION: ${TORCHAUDIO_VERSION}
+        CUDA_VERSION: ${CUDA_VERSION}
+        ENTRYPOINT_PATH: ${ENTRYPOINT_PATH}
+    environment:
+      WORKDIR: ${WORKDIR}
+      VENV_PATH: ${VENV_PATH}
+      PYTHON_VERSION: ${PYTHON_VERSION}
+    
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+
+    volumes:
+      - ${HOST_WORKDIR}:${WORKDIR}
+    deploy:
+      resources:
+        limits:
+          memory: 30G
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    memswap_limit: 30G
+    cpuset: 0-10
+    ipc: host
+    
